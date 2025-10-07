@@ -1,0 +1,16 @@
+// for backend
+
+npm init -y
+npm install express
+npm i nodemon -D
+npm i mongodb
+npm i mongoose
+npm i dotenv
+
+// for frontend
+
+npm create vite@latest .
+npm install
+npm run dev
+npm i react-router-dom
+npm i react-hot-toast // for notifications
