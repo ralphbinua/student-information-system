@@ -2,8 +2,8 @@ import Student from "../models/student-information.js";
 
 export async function createStudent(req, res) {
     try {
-        const { firstName, lastName, email, middleName, age } = req.body;
-        const newStudent = new Student({ firstName, lastName, email, middleName, age });
+        const {name,email, contact_number,home_address, department} = req.body;
+        const newStudent = new Student({ name,email, contact_number,home_address, department});
         const savedStudent = await newStudent.save();
         res.status(201).json(savedStudent);
     } catch (error) {
@@ -38,10 +38,10 @@ export async function getStudent(req, res) {
 
 export async function updateStudent(req, res) {
     try {
-            const { firstName, lastName, email, middleName, age } = req.body;
+            const { name, email, contact_number,home_address } = req.body;
             const updatedStudent = await Student.findByIdAndUpdate(
                 req.params.id,
-                { firstName, lastName, email, middleName, age },
+                { name,email, contact_number,home_address, department},
                 { new: true }
             );
 
