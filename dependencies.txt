@@ -16,5 +16,6 @@ npm install
 npm i react-router-dom
 npm i react-hot-toast // notifications
 npm i lucide-react // icons
+npm i bootstrapn
 npm install axios // access backend
 npm run dev
