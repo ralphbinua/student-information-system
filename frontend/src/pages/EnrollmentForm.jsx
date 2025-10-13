@@ -1,7 +1,8 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import api from "../lib/axios";
+import studentIdGenerator from "../utils/studentIdGenerator";
 
 const EnrollmentForm = () => {
   const [name, setName] = useState("");
@@ -19,7 +20,6 @@ const EnrollmentForm = () => {
 
     if (
       !name.trim() ||
-      !studentId.trim() ||
       !email.trim() ||
       !contact_number.trim() ||
       !home_address.trim() ||
@@ -34,7 +34,7 @@ const EnrollmentForm = () => {
     try {
       await api.post("/students", {
         name,
-        studentId,
+        studentId: studentIdGenerator(),
         email,
         contact_number,
         home_address,
@@ -88,25 +88,6 @@ const EnrollmentForm = () => {
                 </div>
 
                 <div className="mb-3">
-                  <label htmlFor="studentId" className="form-label">
-                    Student ID
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="studentId"
-                    placeholder="e.g. 2025-00123"
-                    pattern="[0-9]{4}-[0-9]{5}"
-                    required
-                    value={studentId}
-                    onChange={(e) => setStudentId(e.target.value)}
-                  />
-                  <div className="invalid-feedback">
-                    Please enter a valid Student ID (format: YYYY-#####).
-                  </div>
-                </div>
-
-                <div className="mb-3">
                   <label htmlFor="email" className="form-label">
                     Email Address
                   </label>
@@ -147,15 +128,15 @@ const EnrollmentForm = () => {
                   <label htmlFor="address" className="form-label">
                     Home Address
                   </label>
-                  <textarea
+                  <input
+                    type="text"
                     className="form-control"
                     id="address"
-                    rows="3"
                     placeholder="Enter address"
                     required
                     value={home_address}
                     onChange={(e) => sethome_address(e.target.value)}
-                  ></textarea>
+                  ></input>
                   <div className="invalid-feedback">
                     Please provide your address.
                   </div>
@@ -182,10 +163,6 @@ const EnrollmentForm = () => {
                     <option value="BS Information Systems">
                       BS Information Systems
                     </option>
-                    <option value="BS Software Engineering">
-                      BS Software Engineering
-                    </option>
-                    <option value="BS Data Science">BS Data Science</option>
                   </select>
                   <div className="invalid-feedback">
                     Please select a course or program.
@@ -200,8 +177,6 @@ const EnrollmentForm = () => {
                   {loading ? "Submitting..." : "Submit"}
                 </button>
               </form>
-
-              <div id="message" className="text-center mt-3 fw-semibold"></div>
             </div>
           </div>
         </div>

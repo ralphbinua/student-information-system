@@ -2,8 +2,8 @@ import Student from "../models/student-information.js";
 
 export async function createStudent(req, res) {
     try {
-        const {name,email, contact_number,home_address, department} = req.body;
-        const newStudent = new Student({ name,email, contact_number,home_address, department});
+        const {name,studentId ,email, contact_number,home_address, department} = req.body;
+        const newStudent = new Student({ name,studentId,email, contact_number,home_address, department});
         const savedStudent = await newStudent.save();
         res.status(201).json(savedStudent);
     } catch (error) {
