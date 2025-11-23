@@ -7,8 +7,7 @@ const App = () => {
   return (
     <div className="relative h-full w-full">
       <Routes>
-        <Route path='/' element={<HomePage/>}/>
-        <Route path='/students' element={<EnrollmentForm/>}/>
+        <Route path='/' element={<EnrollmentForm/>}/>
       </Routes>
     </div>
   )
