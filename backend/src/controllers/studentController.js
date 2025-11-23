@@ -38,7 +38,7 @@ export async function getStudent(req, res) {
 
 export async function updateStudent(req, res) {
     try {
-            const { name, email, contact_number,home_address } = req.body;
+            const { name, email, contact_number,home_address, department } = req.body;
             const updatedStudent = await Student.findByIdAndUpdate(
                 req.params.id,
                 { name,email, contact_number,home_address, department},

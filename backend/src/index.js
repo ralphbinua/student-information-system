@@ -1,8 +1,13 @@
 import express from "express";
+
 import studentRoutes from "./routes/studentRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
+import gradeRoutes from "./routes/gradeRoutes.js";
+
 import { connectDB } from "./config/db.js";
+
 import dotenv from "dotenv";
+
 import cors from "cors";
 import rateLimiter from "./middleware/rateLimiter.js";
 
@@ -21,6 +26,7 @@ app.use(rateLimiter) // middleware to parse JSON
 
 app.use("/api/students", studentRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/grades", gradeRoutes)
 
 app.listen(PORT, () => {
   console.log("Server is running on port", PORT)
