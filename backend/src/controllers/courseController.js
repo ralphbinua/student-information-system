@@ -2,8 +2,8 @@ import Course from '../models/course-information.js';
 
 export async function createCourse(req, res) {
     try {
-        const {courseCode, title, department} = req.body;
-        const newCourse = new Course({ courseCode, title, department});
+        const {courseCode, title, units} = req.body;
+        const newCourse = new Course({ courseCode, title, units});
         const savedCourse = await newCourse.save();
         res.status(201).json(savedCourse);
     } catch (error) {
@@ -22,26 +22,12 @@ export async function getAllCourse(req, res) {
     }
 }
 
-export async function getCourse(req, res) {
-    try {
-        const getCourseById = await Course.findById(req.params.id);
-        if (!getCourseById) {
-            return res.status(404).json({ message: "Course not found" });
-        }else{
-            res.status(200).json(getCourseById);
-        }
-    } catch (error) {
-        console.error("Error fetching course:", error);
-        res.status(500).json({ message: "Server Error", error: error.message });
-    }
-}
-
 export async function updateCourse(req, res) {
     try {
-            const {courseCode, title, department } = req.body;
+            const {courseCode, title, units } = req.body;
             const updatedCourse = await Course.findByIdAndUpdate(
                 req.params.id,
-                { courseCode, title, department},
+                { courseCode, title, units},
                 { new: true }
             );
 

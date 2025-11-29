@@ -1,17 +1,16 @@
 import express from "express";
 
-import studentRoutes from "./routes/studentRoutes.js";
-import courseRoutes from "./routes/courseRoutes.js";
-import gradeRoutes from "./routes/gradeRoutes.js";
+import studentRoutes from "./routes/studentRoutes.js"; // import student routes
+import courseRoutes from "./routes/courseRoutes.js"; // import course routes
+import enrollmentRoutes from "./routes/enrollmentRoutes.js"; // import enrollment routes
 
-import { connectDB } from "./config/db.js";
+import { connectDB } from "./config/db.js"; // connect to database
 
-import dotenv from "dotenv";
+import dotenv from "dotenv"; // load environment variables
 
-import cors from "cors";
-import rateLimiter from "./middleware/rateLimiter.js";
+import cors from "cors"; // enable CORS and access frontend
 
-dotenv.config();
+dotenv.config(); // configure environment variables
 
 const app = express();
 const PORT = process.env.PORT || 5001
@@ -22,11 +21,10 @@ app.use(cors({
   origin: 'http://localhost:5173', // allow requests from this origin
 })); // enable CORS for all routes
 app.use(express.json()); // middleware to parse JSON
-app.use(rateLimiter) // middleware to parse JSON
 
 app.use("/api/students", studentRoutes);
 app.use("/api/courses", courseRoutes);
-app.use("/api/grades", gradeRoutes)
+app.use("/api/enrollment", enrollmentRoutes);
 
 app.listen(PORT, () => {
   console.log("Server is running on port", PORT)
