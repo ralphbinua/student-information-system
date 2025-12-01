@@ -1,0 +1,21 @@
+// for backend
+
+npm init -y
+npm install express
+npm i nodemon -D
+npm i mongodb
+npm i mongoose
+npm i dotenv
+npm i @upstash/ratelimit@2.0.5 @upstash/redis@1.34.9
+npm i cors
+
+// for frontend
+
+npm create vite@latest .
+npm install
+npm i react-router-dom
+npm i react-hot-toast // notifications
+npm i lucide-react // icons
+npm i bootstrap
+npm install axios // access backend
+npm run dev
