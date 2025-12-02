@@ -6,7 +6,6 @@ npm i nodemon -D
 npm i mongodb
 npm i mongoose
 npm i dotenv
-npm i @upstash/ratelimit@2.0.5 @upstash/redis@1.34.9
 npm i cors
 
 // for frontend
