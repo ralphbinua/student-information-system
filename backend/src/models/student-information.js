@@ -8,9 +8,11 @@ const courseEnrollmentSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        // An array to hold multiple grades for this specific course
+        // CORRECTED: This must be an array to allow pushing multiple grades,
+        // as your 'gradeStudent' controller attempts to do.
         grades: {
-            type: Number,
+            type: [Number], // <-- CORRECTED to an array of Numbers
+            default: []     // Initialize as an empty array
         },
         // You might add the date they enrolled here if needed
         enrollmentDate: {
@@ -26,7 +28,11 @@ const courseEnrollmentSchema = new mongoose.Schema(
 // --- 2. Main Student Information Schema ---
 const studentInformationSchema = new mongoose.Schema(
     {
-        name: {
+        firstName: {
+            type: String,
+            required: true
+        },
+        lastName: {
             type: String,
             required: true
         },

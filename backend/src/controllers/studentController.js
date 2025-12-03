@@ -1,11 +1,17 @@
 import Student from "../models/student-information.js";
 import StudentIdGenerator from "../utils/studentIdGenerator.js";
 
-// done http response
+// done http response - Creates a student with an automatically generated studentId
 export async function createStudent(req, res) {
     try {
-        const {name,email} = req.body;
-        const newStudent = new Student({ name,studentId: StudentIdGenerator(),email});
+        const {firstName, lastName, email} = req.body;
+        // Use the imported StudentIdGenerator for the custom studentId
+        const newStudent = new Student({
+            firstName, // Now correctly populating the required path
+            lastName,  // Now correctly populating the required path
+            studentId: StudentIdGenerator(),
+            email
+        });
         const savedStudent = await newStudent.save();
         res.status(201).json({ message: "New Student created", student: savedStudent});
     } catch (error) {
@@ -30,6 +36,7 @@ export async function getAllStudent(req, res) {
 export async function getStudent(req, res) {
     try {
         const targetStudentId = req.params.id;
+        // Find by custom studentId, not MongoDB's _id
         const getStudentByCustomId = await Student.findOne({ studentId: targetStudentId });
 
         if (!getStudentByCustomId) {
@@ -47,20 +54,21 @@ export async function getStudent(req, res) {
 // done http response
 export async function updateStudent(req, res) {
     try {
-            const { name,email } = req.body;
+        const { name, email } = req.body;
+        const targetStudentId = req.params.id;
 
-            const targetStudentId = req.params.id;
-            const updatedStudent = await Student.findOneAndUpdate(
-                { studentId: targetStudentId },
-                { name,email},
-                { new: true, runValidators: true }
-            );
+        // Update by custom studentId
+        const updatedStudent = await Student.findOneAndUpdate(
+            { studentId: targetStudentId },
+            { name, email},
+            { new: true, runValidators: true }
+        );
 
-            if (!updatedStudent) {
-                return res.status(404).json({ message: "Student not found" });
-            }else{
-                res.status(200).json({message: "Successfull updating student", updatedStudent});
-            }
+        if (!updatedStudent) {
+            return res.status(404).json({ message: "Student not found" });
+        }else{
+            res.status(200).json({message: "Successfull updating student", updatedStudent});
+        }
     } catch (error) {
         console.error("Error updating student:", error);
         res.status(500).json({ message: "Server Error", error: error.message });
@@ -72,7 +80,9 @@ export async function updateStudent(req, res) {
 export async function deleteStudent(req, res) {
     try {
         const targetStudentId = req.params.id;
+        // Delete by custom studentId
         const deletedStudent = await Student.findOneAndDelete({ studentId: targetStudentId });
+
         if (!deletedStudent) {
             return res.status(404).json({ message: "Student not found" });
         }else{
@@ -84,32 +94,32 @@ export async function deleteStudent(req, res) {
     }
 }
 
-// done http response
+// done http response - Fetches student grades using MongoDB aggregation
 export async function getStudentGrades(req, res) {
     try {
         const targetStudentId = req.params.id;
 
         const pipeline = [
-            // Find the specific student
+            // 1. Match: Find the specific student document by custom studentId
             { $match: { studentId: targetStudentId } },
 
-            // Deconstruct the coursesEnrolled array
+            // 2. Unwind: Deconstruct the coursesEnrolled array
             { $unwind: "$coursesEnrolled" },
 
-            // Join with the CourseInformation collection
+            // 3. Lookup: Join with the CourseInformation collection
             {
                 $lookup: {
                     from: "courseinformations", // The actual name of courses collection
                     localField: "coursesEnrolled.courseCode", // Field in Student document
-                    foreignField: "courseCode",   // Field in Course document
+                    foreignField: "courseCode",    // Field in Course document
                     as: "courseDetails"
                 }
             },
 
-            //  Deconstruct the courseDetails array
+            // 4. Unwind: Deconstruct the courseDetails array
             { $unwind: { path: "$courseDetails", preserveNullAndEmptyArrays: true } },
 
-            // Reconstruct the student document and create the 'enrollments'
+            // 5. Group: Reconstruct the student document and create the 'enrollments' array
             {
                 $group: {
                     _id: "$_id",
@@ -118,17 +128,18 @@ export async function getStudentGrades(req, res) {
                     createdAt: { $first: "$createdAt" },
 
                     enrollments: {
-                        // allow multiple entries if the student took the course twice
                         $push: {
-                            // Extract course details from the joined 'courseDetails'
-                            courseName: "$courseDetails.title", // show course name
-                            units: "$courseDetails.units", // show course units
-                            grade: { $arrayElemAt: ["$coursesEnrolled.grades", 0] } // show grades
+                            courseName: "$courseDetails.title",
+                            // Use units from courseDetails (Assuming it's named 'units' or 'credits' in the Course schema)
+                            units: "$courseDetails.units",
+                            // Get the first element of the grades array (assuming one grade per enrollment)
+                            grade: { $arrayElemAt: ["$coursesEnrolled.grades", 0] }
                         }
                     }
                 }
             },
 
+            // 6. Project: Final shaping and field renaming for the desired output
             {
                 $project: {
                     _id: 0,
@@ -141,10 +152,26 @@ export async function getStudentGrades(req, res) {
             }
         ];
 
+        // Execute the pipeline and get the first result
         const [studentData] = await Student.aggregate(pipeline);
 
         if (!studentData) {
-            return res.status(404).json({ message: `Student with ID ${targetStudentId} not found.` });
+            // Check if student exists at all
+            const studentExists = await Student.findOne({ studentId: targetStudentId });
+            if (!studentExists) {
+                 return res.status(404).json({ message: `Student with ID ${targetStudentId} not found.` });
+            }
+            // If student exists but has no enrollments/grades, return their basic info
+            return res.status(200).json({
+                message: "Student found, but has no enrollments or grades.",
+                studentData: {
+                    id: studentExists._id,
+                    name: studentExists.name,
+                    email: studentExists.email,
+                    createdAt: studentExists.createdAt.toISOString().split('T')[0],
+                    enrollments: []
+                }
+            });
         }
 
         res.status(200).json({message:"Successfull fetching student grades", studentData});

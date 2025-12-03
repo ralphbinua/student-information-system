@@ -7,6 +7,8 @@ npm i mongodb
 npm i mongoose
 npm i dotenv
 npm i cors
+npm install swagger-jsdoc --save
+npm install swagger-ui-express
 
 // for frontend
 

@@ -1,6 +1,7 @@
 import Student from "../models/student-information.js";
+import CourseInformation from "../models/course-information.js";
 
-// done http response
+// Function to handle POST /enroll
 export async function enrollStudent(req, res) {
     try {
         const { studentId, courseCode } = req.body;
@@ -9,35 +10,38 @@ export async function enrollStudent(req, res) {
             return res.status(400).json({ message: "Missing studentId or courseCode in request body" });
         }
 
-        // Check if the student is already enrolled in the course
+        // 1. Check if the student is already enrolled in the course
         const existingEnrollment = await Student.findOne({
             studentId: studentId,
-            "coursesEnrolled.courseCode": courseCode
+            "coursesEnrolled.courseCode": courseCode // Mongoose dot notation to check inside the array
         });
 
         if (existingEnrollment) {
             return res.status(409).json({ message: `Student ${studentId} is already enrolled in course ${courseCode}` });
         }
 
-        // Adding the new course to the coursesEnrolled
+        // 2. Add the new course to the coursesEnrolled array using $push
         const updatedStudent = await Student.findOneAndUpdate(
             { studentId: studentId }, // Find the student by the studentId provided in the body
             {
                 $push: {
                     coursesEnrolled: {
                         courseCode: courseCode,
+                        // grades will automatically default to [] as defined in the schema
                     }
                 }
             },
-            { new: true }
+            { new: true } // Return the updated document
         );
 
         if (!updatedStudent) {
-            // Check if the student exists
+            // If findOneAndUpdate didn't find the student
             return res.status(404).json({ message: `Student with ID ${studentId} not found` });
         }
+
+        // Success: Return the updated student document
         res.status(201).json({
-            message: "Course enrolled successfully",
+            message: "Student enrolled successfully",
             student: updatedStudent
         });
 
@@ -47,30 +51,30 @@ export async function enrollStudent(req, res) {
     }
 }
 
-// done http response
+// Function to handle POST /grade
 export async function gradeStudent(req, res) {
     try {
         const { studentId, courseCode, grade } = req.body;
 
         if (!studentId || !courseCode || grade === undefined) {
-            return res.status(400).json({ message: "Missing studentId, courseCode, or grades" });
+            return res.status(400).json({ message: "Missing studentId, courseCode, or grade value" });
         }
 
-        // Find the student and the specific course
-        // Add the grades to the specific course
+        // 1. Find the student and the specific course within the coursesEnrolled array.
+        // 2. Use the $push operator to add the new grade to that specific course's grades array.
         const updatedStudent = await Student.findOneAndUpdate(
             {
                 studentId: studentId,
-                "coursesEnrolled.courseCode": courseCode // find the specific course
+                "coursesEnrolled.courseCode": courseCode // Find the array element that matches the courseCode
             },
             {
-                $push: { "coursesEnrolled.$.grades": grade } // add grades
+                $push: { "coursesEnrolled.$.grades": grade } // The positional operator ($) targets the matched array element
             },
             { new: true } // Return the updated document
         );
 
         if (!updatedStudent) {
-            // if the student or the course enrollment is not found.
+            // This happens if the student or the course enrollment is not found.
             return res.status(404).json({ message: `Enrollment for Student ${studentId} in Course ${courseCode} not found.` });
         }
 
