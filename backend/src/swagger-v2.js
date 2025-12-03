@@ -62,11 +62,3 @@ const swaggerSpec = swaggerJSDoc(options);
 
 
 export default swaggerSpec;
-
-
-
-
-
-
-
-

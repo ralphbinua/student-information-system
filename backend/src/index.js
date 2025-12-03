@@ -31,7 +31,7 @@ connectDB(); // connect to db
 
 // 3. FIX CORS (Use environment variable for security and flexibility)
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173', // Uses cloud variable or local default
+     origin: process.env.CORS_ORIGIN || 'http://localhost:5173', // Uses cloud variable or local default
 }));
 app.use(express.json());
 
@@ -44,5 +44,5 @@ app.use("/api/v2/courses", courseRoutes);
 app.use("/api/v2/enrollment", enrollmentRoutes);
 
 app.listen(PORT, () => {
-  console.log("Server is running on port", PORT)
+console.log("Server is running on port", PORT)
 });
