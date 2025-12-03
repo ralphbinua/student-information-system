@@ -168,7 +168,8 @@ export async function getStudentGrades(req, res) {
                 message: "Student found, but has no enrollments or grades.",
                 studentData: {
                     id: studentExists._id,
-                    name: studentExists.name,
+                    firstName: studentExists.firstName,
+                    lastName: studentExists.lastName,
                     email: studentExists.email,
                     createdAt: studentExists.createdAt.toISOString().split('T')[0],
                     enrollments: []
