@@ -123,7 +123,8 @@ export async function getStudentGrades(req, res) {
             {
                 $group: {
                     _id: "$_id",
-                    name: { $first: "$name" },
+                    firstName: { $first: "$firstName" },
+                    lastName: { $first: "$lastName" },
                     email: { $first: "$email" },
                     createdAt: { $first: "$createdAt" },
 
@@ -144,7 +145,8 @@ export async function getStudentGrades(req, res) {
                 $project: {
                     _id: 0,
                     id: "$_id",
-                    name: 1,
+                    firstName: 1,
+                    lastName: 1,
                     email: 1,
                     createdAt: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
                     enrollments: 1
